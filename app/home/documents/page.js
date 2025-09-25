@@ -1,7 +1,52 @@
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { ScrollArea } from "@/components/ui/scroll-area";
+
 export default function DocumentsPage() {
+    const pdfFiles = [
+        { id: 1, name: "Report_Q1.pdf" },
+        { id: 2, name: "Project_Plan.pdf" },
+        { id: 3, name: "Invoice_2025.pdf" },
+        { id: 4, name: "Meeting_Notes.pdf" },
+        { id: 5, name: "Resume.pdf" },
+        { id: 6, name: "Budget_2025.pdf" },
+        { id: 7, name: "Presentation_Deck.pdf" },
+        { id: 8, name: "Research_Paper.pdf" },
+        { id: 9, name: "Contract_Agreement.pdf" },
+        { id: 10, name: "User_Manual.pdf" },
+    ];
+
     return (
-        <div className="h-screen w-full flex flex-col items-center justify-center pt-16">
-            <div className="h-full w-full"></div>
+        <div className="h-screen w-full flex flex-col pt-16">
+            <div className="h-full w-full flex flex-col px-6 md:px-16 py-4">
+                {/* Header Section - Fixed Height */}
+                <div className="flex-shrink-0 mb-6">
+                    <h1 className="text-3xl font-sans font-bold">
+                        YOUR DOCUMENTS
+                    </h1>
+                    <p className="text-md mt-4">
+                        Upload your documents and let our AI-powered system{" "}
+                        <br />
+                        analyze and understand them instantly.
+                    </p>
+                </div>
+
+                {/* ScrollArea - Takes remaining height */}
+                <ScrollArea className="h-3/4 w-full px-2 border-2 rounded-3xl p-4">
+                    <div className="space-y-2">
+                        {pdfFiles.map((file, i) => (
+                            <Card key={i} className="w-full">
+                                <CardContent className="py-2 w-full flex items-center justify-between px-6">
+                                    {file.name}
+                                    <Button variant="destructive">
+                                        Delete
+                                    </Button>
+                                </CardContent>
+                            </Card>
+                        ))}
+                    </div>
+                </ScrollArea>
+            </div>
         </div>
     );
 }
