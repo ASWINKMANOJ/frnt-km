@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { ScrollArea } from "@/components/ui/scroll-area";
+import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 
 export default function DocumentsPage() {
     const pdfFiles = [
@@ -31,21 +31,16 @@ export default function DocumentsPage() {
                     </p>
                 </div>
 
-                {/* ScrollArea - Takes remaining height */}
-                <ScrollArea className="h-3/4 w-full px-2 border-2 rounded-3xl p-4">
-                    <div className="space-y-2">
-                        {pdfFiles.map((file, i) => (
-                            <Card key={i} className="w-full">
-                                <CardContent className="py-2 w-full flex items-center justify-between px-6">
-                                    {file.name}
-                                    <Button variant="destructive">
-                                        Delete
-                                    </Button>
-                                </CardContent>
-                            </Card>
-                        ))}
-                    </div>
-                </ScrollArea>
+                <div className="flex flex-col flex-1 gap-2 w-full z-10 overflow-y-auto px-2 border-2 rounded-3xl p-4">
+                    {pdfFiles.map((file, i) => (
+                        <div key={i} className="w-full">
+                            <div className="py-2 w-full flex items-center justify-between px-6 border-2">
+                                {file.name}
+                                <Button variant="destructive">Delete</Button>
+                            </div>
+                        </div>
+                    ))}
+                </div>
             </div>
         </div>
     );
