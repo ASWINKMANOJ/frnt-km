@@ -11,117 +11,93 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import Link from "next/link";
-import { useState } from "react";
+import { useActionState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { authenticateUser, getRouteByRole, storeAuthData } from "@/lib/auth";
+import { login } from "@/app/actions/auth";
 
 export function LoginForm({ className, ...props }) {
-    const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("");
-    const [isLoading, setIsLoading] = useState(false);
-    const [error, setError] = useState("");
+    const [state, action, pending] = useActionState(login, undefined);
     const router = useRouter();
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        setIsLoading(true);
-        setError("");
-
-        try {
-            const result = await authenticateUser(email, password);
-
-            if (result.success) {
-                // Store authentication data
-                storeAuthData(result.user, result.token);
-
-                // Get role-based route
-                const redirectRoute = getRouteByRole(result.user.role);
-
-                // Redirect to appropriate route
-                router.push(redirectRoute);
-            } else {
-                setError(result.error);
-            }
-        } catch (err) {
-            setError("An unexpected error occurred. Please try again.");
-        } finally {
-            setIsLoading(false);
+    // Handle successful login redirect
+    useEffect(() => {
+        if (state?.success && state?.redirectTo) {
+            router.push(state.redirectTo);
         }
-    };
+    }, [state, router]);
 
     return (
         <div className={cn("flex flex-col gap-6", className)} {...props}>
             <Card>
                 <CardHeader>
-                    <CardTitle>Login to your account</CardTitle>
+                    <CardTitle>Welcome back</CardTitle>
                     <CardDescription>
-                        Enter your email below to login to your account
+                        Enter your credentials to access your account
                     </CardDescription>
                 </CardHeader>
                 <CardContent>
-                    <form onSubmit={handleSubmit}>
+                    <form action={action}>
                         <div className="flex flex-col gap-6">
-                            {error && (
+                            {state?.message && (
                                 <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md text-sm">
-                                    {error}
+                                    {state.message}
                                 </div>
                             )}
                             <div className="grid gap-3">
                                 <Label htmlFor="email">Email</Label>
                                 <Input
                                     id="email"
+                                    name="email"
                                     type="email"
                                     placeholder="m@example.com"
                                     required
-                                    value={email}
-                                    onChange={(e) => setEmail(e.target.value)}
                                 />
+                                {state?.errors?.email && (
+                                    <p className="text-red-600 text-sm">
+                                        {state.errors.email[0]}
+                                    </p>
+                                )}
                             </div>
                             <div className="grid gap-3">
-                                <div className="flex items-center">
-                                    <Label htmlFor="password">Password</Label>
-                                    <a
-                                        href="#"
-                                        className="ml-auto inline-block text-sm underline-offset-4 hover:underline"
-                                    >
-                                        Forgot your password?
-                                    </a>
-                                </div>
+                                <Label htmlFor="password">Password</Label>
                                 <Input
                                     id="password"
+                                    name="password"
                                     type="password"
                                     required
-                                    value={password}
-                                    onChange={(e) =>
-                                        setPassword(e.target.value)
-                                    }
                                 />
+                                {state?.errors?.password && (
+                                    <p className="text-red-600 text-sm">
+                                        {state.errors.password[0]}
+                                    </p>
+                                )}
                             </div>
                             <div className="flex flex-col gap-3">
                                 <Button
                                     type="submit"
                                     className="w-full"
-                                    disabled={isLoading}
+                                    disabled={pending}
                                 >
-                                    {isLoading ? "Signing in..." : "Login"}
+                                    {pending ? "Signing in..." : "Sign in"}
                                 </Button>
-                                <Button
-                                    variant="outline"
-                                    className="w-full"
-                                    disabled={isLoading}
-                                >
-                                    Login with Google
-                                </Button>
+                                <div className="text-center text-sm">
+                                    Don't have an account?{" "}
+                                    <Link
+                                        href={"/auth/signup"}
+                                        className="underline underline-offset-4"
+                                    >
+                                        Sign up
+                                    </Link>
+                                </div>
+                                <div className="text-center text-sm">
+                                    <Link
+                                        href={"/auth/forgot"}
+                                        className="underline underline-offset-4"
+                                    >
+                                        Forgot your password?
+                                    </Link>
+                                </div>
                             </div>
-                        </div>
-                        <div className="mt-4 text-center text-sm">
-                            Don&apos;t have an account?{" "}
-                            <Link
-                                href={"/auth/signup"}
-                                className="underline underline-offset-4"
-                            >
-                                Sign up
-                            </Link>
                         </div>
                     </form>
                 </CardContent>

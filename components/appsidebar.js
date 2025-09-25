@@ -1,4 +1,12 @@
-import { Calendar, Home, Inbox, Search, Settings, LogOut } from "lucide-react";
+import {
+    Calendar,
+    Home,
+    Inbox,
+    Search,
+    Settings,
+    LogOut,
+    Plus,
+} from "lucide-react";
 
 import {
     Sidebar,
@@ -22,8 +30,11 @@ import {
     DropdownMenuSeparator,
     DropdownMenuGroup,
     DropdownMenuItem,
-} from "@radix-ui/react-dropdown-menu";
-import { Avatar, AvatarFallback, AvatarImage } from "@radix-ui/react-avatar";
+} from "@/components/ui/dropdown-menu";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Button } from "./ui/button";
+import { LogoutButton } from "./logout-button";
+import { useState } from "react";
 
 // Menu items.
 const items = [
@@ -54,8 +65,47 @@ const items = [
     },
 ];
 
+// Dummy data for chats and files
+const initialChats = [
+    { id: "c1", title: "Quarterly Report Summary", updatedAt: "10:12 AM" },
+    { id: "c2", title: "Onboarding Checklist", updatedAt: "Yesterday" },
+    { id: "c3", title: "Risk Register Review", updatedAt: "Mon" },
+    { id: "c4", title: "Product Roadmap Q4", updatedAt: "Sep 12" },
+];
+
+const initialFiles = [
+    { id: "f1", name: "Q3_Report.pdf", checked: true },
+    { id: "f2", name: "Onboarding_Guide.docx", checked: false },
+    { id: "f3", name: "Risk_Register.xlsx", checked: true },
+    { id: "f4", name: "Roadmap_Q4.pptx", checked: false },
+];
+
 export function AppSidebar({ isLoading }) {
     const { isMobile } = useSidebar();
+    const [chats, setChats] = useState(initialChats);
+    const [activeChatId, setActiveChatId] = useState(
+        initialChats[0]?.id || null
+    );
+    const [files, setFiles] = useState(initialFiles);
+
+    function handleNewChat() {
+        const timestamp = new Date();
+        const newChat = {
+            id: `c_${timestamp.getTime()}`,
+            title: "New Chat",
+            updatedAt: "Just now",
+        };
+        setChats((prev) => [newChat, ...prev]);
+        setActiveChatId(newChat.id);
+    }
+
+    function toggleFile(fileId) {
+        setFiles((prev) =>
+            prev.map((f) =>
+                f.id === fileId ? { ...f, checked: !f.checked } : f
+            )
+        );
+    }
     return (
         <Sidebar>
             <SidebarContent>
@@ -71,18 +121,44 @@ export function AppSidebar({ isLoading }) {
                                 ))}
                             </SidebarMenu>
                         ) : (
-                            <SidebarMenu>
-                                {items.map((item) => (
-                                    <SidebarMenuItem key={item.title}>
-                                        <SidebarMenuButton asChild>
-                                            <a href={item.url}>
-                                                <item.icon />
-                                                <span>{item.title}</span>
-                                            </a>
-                                        </SidebarMenuButton>
-                                    </SidebarMenuItem>
-                                ))}
-                            </SidebarMenu>
+                            <>
+                                <div className="px-2 pb-2">
+                                    <Button
+                                        size="sm"
+                                        className="w-full"
+                                        onClick={handleNewChat}
+                                    >
+                                        <Plus className="mr-2 h-4 w-4" /> New
+                                        Chat
+                                    </Button>
+                                </div>
+                                <SidebarMenu>
+                                    {chats.map((chat) => (
+                                        <SidebarMenuItem key={chat.id}>
+                                            <SidebarMenuButton asChild>
+                                                <button
+                                                    type="button"
+                                                    className={`w-full text-left ${
+                                                        chat.id === activeChatId
+                                                            ? "bg-accent"
+                                                            : ""
+                                                    }`}
+                                                    onClick={() =>
+                                                        setActiveChatId(chat.id)
+                                                    }
+                                                >
+                                                    <span className="truncate">
+                                                        {chat.title}
+                                                    </span>
+                                                    <span className="ml-auto text-xs text-muted-foreground">
+                                                        {chat.updatedAt}
+                                                    </span>
+                                                </button>
+                                            </SidebarMenuButton>
+                                        </SidebarMenuItem>
+                                    ))}
+                                </SidebarMenu>
+                            </>
                         )}
                     </SidebarGroupContent>
                 </SidebarGroup>
@@ -99,14 +175,25 @@ export function AppSidebar({ isLoading }) {
                             </SidebarMenu>
                         ) : (
                             <SidebarMenu>
-                                {items.map((item) => (
-                                    <SidebarMenuItem key={item.title}>
-                                        <SidebarMenuButton asChild>
-                                            <a href={item.url}>
-                                                <item.icon />
-                                                <span>{item.title}</span>
-                                            </a>
-                                        </SidebarMenuButton>
+                                {files.map((file) => (
+                                    <SidebarMenuItem key={file.id}>
+                                        <div className="flex items-center gap-3 px-2 py-1.5">
+                                            <input
+                                                id={`file-${file.id}`}
+                                                type="checkbox"
+                                                className="h-4 w-4 accent-primary"
+                                                checked={file.checked}
+                                                onChange={() =>
+                                                    toggleFile(file.id)
+                                                }
+                                            />
+                                            <label
+                                                htmlFor={`file-${file.id}`}
+                                                className="flex-1 truncate text-sm cursor-pointer"
+                                            >
+                                                {file.name}
+                                            </label>
+                                        </div>
                                     </SidebarMenuItem>
                                 ))}
                             </SidebarMenu>
@@ -116,65 +203,19 @@ export function AppSidebar({ isLoading }) {
             </SidebarContent>
             <SidebarFooter>
                 <SidebarMenu>
-                    <SidebarMenuItem>
-                        <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                                <SidebarMenuButton
-                                    size="lg"
-                                    className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
-                                >
-                                    <Avatar className="h-8 w-8 rounded-lg grayscale">
-                                        <AvatarImage src="#" alt="CN" />
-                                        <AvatarFallback className="rounded-lg">
-                                            CN
-                                        </AvatarFallback>
-                                    </Avatar>
-                                    <div className="grid flex-1 text-left text-sm leading-tight">
-                                        <span className="truncate font-medium">
-                                            m
-                                        </span>
-                                        <span className="text-muted-foreground truncate text-xs">
-                                            m@example.com
-                                        </span>
-                                    </div>
-                                </SidebarMenuButton>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent
-                                className="w-(--radix-dropdown-menu-trigger-width) min-w-62 ml-2 rounded-lg"
-                                side={isMobile ? "bottom" : "right"}
-                                align="end"
-                                sideOffset={4}
-                            >
-                                <DropdownMenuLabel className="p-0 font-normal">
-                                    <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
-                                        <Avatar className="h-8 w-8 rounded-lg">
-                                            <AvatarImage src="#" alt="CN" />
-                                            <AvatarFallback className="rounded-lg">
-                                                CN
-                                            </AvatarFallback>
-                                        </Avatar>
-                                        <div className="grid flex-1 text-left text-sm leading-tight">
-                                            <span className="truncate font-medium">
-                                                m
-                                            </span>
-                                            <span className="text-muted-foreground truncate text-xs">
-                                                m@example.com
-                                            </span>
-                                        </div>
-                                    </div>
-                                </DropdownMenuLabel>
-                                <DropdownMenuSeparator />
-                                <DropdownMenuGroup></DropdownMenuGroup>
-                                <DropdownMenuSeparator />
-                                <DropdownMenuItem>
-                                    <div className="flex items-center justify-between px-8">
-                                        <LogOut />
-                                        Log out
-                                    </div>
-                                </DropdownMenuItem>
-                            </DropdownMenuContent>
-                        </DropdownMenu>
-                    </SidebarMenuItem>
+                    <SidebarFooter>
+                        <div className="py-2 w-full px-2 flex items-center justify-between">
+                            <Avatar>
+                                <AvatarImage src="#" alt="profile" />
+                                <AvatarFallback>CN</AvatarFallback>
+                            </Avatar>
+                            <div>
+                                <LogoutButton variant="outline">
+                                    Log Out
+                                </LogoutButton>
+                            </div>
+                        </div>
+                    </SidebarFooter>
                 </SidebarMenu>
             </SidebarFooter>
         </Sidebar>

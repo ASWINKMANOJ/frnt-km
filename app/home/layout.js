@@ -9,9 +9,9 @@ export default function HomeLayout({ children }) {
     const isActive = (href) => pathname.startsWith(href);
 
     return (
-        <ProtectedRoute allowedRoles={["user", "guest"]}>
+        <ProtectedRoute allowedRoles={["user", "admin", "moderator"]}>
             <div className="min-h-screen bg-gray-50 relative">
-                <div className="w-auto pt-4 absolute top-2 left-1/2 -translate-x-1/2">
+                <div className="w-auto pt-4 absolute top-2 left-1/2 -translate-x-1/2 z-10">
                     <div className="max-w-7xl mx-auto px-4 md:px-6">
                         <div className="w-full flex items-center justify-center">
                             <nav className="flex items-center gap-2 rounded-full bg-white shadow-lg ring-1 ring-black/5 px-2 py-1">

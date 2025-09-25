@@ -11,45 +11,20 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import Link from "next/link";
-import { useState } from "react";
+import { useActionState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { getRouteByRole, storeAuthData } from "@/lib/auth";
+import { signup } from "@/app/actions/auth";
 
 export function SignupForm({ className, ...props }) {
-    const [name, setName] = useState("");
-    const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("");
-    const [isLoading, setIsLoading] = useState(false);
-    const [error, setError] = useState("");
+    const [state, action, pending] = useActionState(signup, undefined);
     const router = useRouter();
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        setIsLoading(true);
-        setError("");
-
-        try {
-            const res = await fetch("/api/auth/signup", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ name, email, password }),
-            });
-            const data = await res.json();
-
-            if (!res.ok || !data.success) {
-                setError(data.message || "Signup failed");
-            } else {
-                // backend returns role "user" only
-                storeAuthData(data.user, data.token);
-                const redirectRoute = getRouteByRole(data.user.role || "user");
-                router.push(redirectRoute);
-            }
-        } catch (err) {
-            setError("Network error. Please try again.");
-        } finally {
-            setIsLoading(false);
+    // Handle successful signup redirect
+    useEffect(() => {
+        if (state?.success && state?.redirectTo) {
+            router.push(state.redirectTo);
         }
-    };
+    }, [state, router]);
 
     return (
         <div className={cn("flex flex-col gap-6", className)} {...props}>
@@ -61,54 +36,73 @@ export function SignupForm({ className, ...props }) {
                     </CardDescription>
                 </CardHeader>
                 <CardContent>
-                    <form onSubmit={handleSubmit}>
+                    <form action={action}>
                         <div className="flex flex-col gap-6">
-                            {error && (
+                            {state?.message && (
                                 <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md text-sm">
-                                    {error}
+                                    {state.message}
                                 </div>
                             )}
                             <div className="grid gap-3">
                                 <Label htmlFor="name">Name</Label>
                                 <Input
                                     id="name"
+                                    name="name"
                                     type="text"
                                     placeholder="Jane Doe"
                                     required
-                                    value={name}
-                                    onChange={(e) => setName(e.target.value)}
                                 />
+                                {state?.errors?.name && (
+                                    <p className="text-red-600 text-sm">
+                                        {state.errors.name[0]}
+                                    </p>
+                                )}
                             </div>
                             <div className="grid gap-3">
                                 <Label htmlFor="email">Email</Label>
                                 <Input
                                     id="email"
+                                    name="email"
                                     type="email"
                                     placeholder="m@example.com"
                                     required
-                                    value={email}
-                                    onChange={(e) => setEmail(e.target.value)}
                                 />
+                                {state?.errors?.email && (
+                                    <p className="text-red-600 text-sm">
+                                        {state.errors.email[0]}
+                                    </p>
+                                )}
                             </div>
                             <div className="grid gap-3">
                                 <Label htmlFor="password">Password</Label>
                                 <Input
                                     id="password"
+                                    name="password"
                                     type="password"
                                     required
-                                    value={password}
-                                    onChange={(e) =>
-                                        setPassword(e.target.value)
-                                    }
                                 />
+                                {state?.errors?.password && (
+                                    <div className="text-red-600 text-sm">
+                                        <p>Password must:</p>
+                                        <ul className="list-disc list-inside">
+                                            {state.errors.password.map(
+                                                (error) => (
+                                                    <li key={error}>
+                                                        - {error}
+                                                    </li>
+                                                )
+                                            )}
+                                        </ul>
+                                    </div>
+                                )}
                             </div>
                             <div className="flex flex-col gap-3">
                                 <Button
                                     type="submit"
                                     className="w-full"
-                                    disabled={isLoading}
+                                    disabled={pending}
                                 >
-                                    {isLoading
+                                    {pending
                                         ? "Creating account..."
                                         : "Create account"}
                                 </Button>

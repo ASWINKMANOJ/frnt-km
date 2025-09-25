@@ -1,39 +1,35 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
+import { decrypt } from "@/lib/session";
 
-/**
- * Middleware for handling authentication and role-based access control
- */
-export function middleware(request) {
-    const { pathname } = request.nextUrl;
+// Specify protected and public routes
+const protectedRoutes = ["/dashboard", "/home"];
+const publicRoutes = ["/auth/login", "/auth/signup", "/auth/forgot", "/"];
 
-    // Get token from cookies or headers
-    const token =
-        request.cookies.get("token")?.value ||
-        request.headers.get("authorization")?.replace("Bearer ", "");
-
-    // Public routes that don't require authentication
-    const publicRoutes = ["/", "/auth/login", "/auth/signup", "/auth/forgot"];
-
-    // Check if current route is public
-    const isPublicRoute = publicRoutes.some((route) =>
-        pathname.startsWith(route)
+export default async function middleware(req) {
+    // Check if the current route is protected or public
+    const path = req.nextUrl.pathname;
+    const isProtectedRoute = protectedRoutes.some((route) =>
+        path.startsWith(route)
     );
+    const isPublicRoute = publicRoutes.some((route) => path.startsWith(route));
 
-    // If it's a public route, allow access
-    if (isPublicRoute) {
-        return NextResponse.next();
+    // Decrypt the session from the cookie
+    const cookie = req.cookies.get("session")?.value;
+    const session = await decrypt(cookie);
+
+    // Redirect to /auth/login if the user is not authenticated
+    if (isProtectedRoute && !session?.userId) {
+        return NextResponse.redirect(new URL("/auth/login", req.nextUrl));
     }
 
-    // If no token and trying to access protected route, redirect to login
-    if (!token) {
-        const loginUrl = new URL("/auth/login", request.url);
-        loginUrl.searchParams.set("redirect", pathname);
-        return NextResponse.redirect(loginUrl);
+    // Redirect to /home if the user is authenticated and on public auth routes
+    if (
+        isPublicRoute &&
+        session?.userId &&
+        (path.startsWith("/auth/login") || path.startsWith("/auth/signup"))
+    ) {
+        return NextResponse.redirect(new URL("/home/chat", req.nextUrl));
     }
-
-    // TODO: Verify token with your backend
-    // For now, we'll allow access if token exists
-    // In production, you should verify the token and extract user role
 
     return NextResponse.next();
 }

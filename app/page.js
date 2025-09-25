@@ -64,16 +64,16 @@ export default function Home() {
                         ref={headingRef}
                         className="h-full w-full flex flex-col justify-center space-y-4 md:pl-16 pl-4"
                     >
-                        <h1 className="text-4xl  opacity-0 translate-y-4 md:text-8xl font-sans font-bold ">
+                        <h1 className="text-4xl  opacity-0 translate-y-4 md:text-7xl font-sans font-bold ">
                             YOUR DOCUMENTS KNOW
                         </h1>
-                        <h1 className="text-4xl opacity-0 translate-y-4 md:text-8xl font-sans font-bold ">
+                        <h1 className="text-4xl opacity-0 translate-y-4 md:text-7xl font-sans font-bold ">
                             EVERYTHING
                         </h1>
-                        <h1 className="text-4xl opacity-0 translate-y-4 md:text-8xl font-sans font-bold">
+                        <h1 className="text-4xl opacity-0 translate-y-4 md:text-7xl font-sans font-bold">
                             JUST ASK THEM
                         </h1>
-                        <h1 className="text-2xl opacity-0 translate-y-4 md:text-4xl font-sans font-light mt-8">
+                        <h1 className="text-2xl opacity-0 translate-y-4 md:text-3xl font-sans font-light mt-8">
                             Stop wasting time searching through files. Ask your
                             documents directly. Get the information you need
                             instantly.
