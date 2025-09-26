@@ -5,6 +5,7 @@ import { useGSAP } from "@gsap/react";
 import Navbar from "@/components/navbar";
 import Features from "@/components/features";
 import About from "@/components/aboutus";
+import ProjectStory from "@/components/project-story";
 import { DotLottieReact } from "@lottiefiles/dotlottie-react";
 
 gsap.registerPlugin(useGSAP);
@@ -14,6 +15,7 @@ export default function Home() {
     const headingRef = useRef(null);
     const colorRef = useRef(null);
     const navRef = useRef(null);
+    const lottieRef = useRef(null);
 
     useGSAP(() => {
         const tl = gsap.timeline();
@@ -38,7 +40,12 @@ export default function Home() {
                 ease: "power2.out",
             },
             "<"
-        );
+        ).to(lottieRef.current, {
+            alpha: 1,
+            y:0,
+            duration: 0.6,
+            ease: "power2.out",
+        }, "<");
         tl.to(colorRef.current, {
             backgroundColor: "#f5f5f5",
             duration: 0.2,
@@ -50,6 +57,7 @@ export default function Home() {
             className="h-full w-full flex items-center flex-col justify-center bg-neutral-900"
         >
             <div
+                id="home"
                 ref={backgroundRef}
                 className="h-screen w-0 flex flex-col items-center justify-center origin-center bg-neutral-100"
             >
@@ -62,7 +70,7 @@ export default function Home() {
                 <div className="h-full w-full flex items-center justify-center">
                     <div
                         ref={headingRef}
-                        className="h-full w-full flex flex-col justify-center space-y-4 md:pl-16 pl-4"
+                        className="h-full w-full hover:translate-x-2 transition-all duration-500 flex flex-col justify-center space-y-4 md:pl-16 pl-4"
                     >
                         <h1 className="text-4xl  opacity-0 translate-y-4 md:text-7xl font-sans font-bold ">
                             YOUR DOCUMENTS KNOW
@@ -80,7 +88,7 @@ export default function Home() {
                         </h1>
                     </div>
                     <div className=" hidden md:visible md:h-12 md:w-full md:flex items-center justify-center">
-                        <div className="w-full m-16  hover:scale-105 duration-700 aspect-square flex items-center justify-center">
+                        <div ref={lottieRef} className="w-full m-16  hover:scale-105 duration-700 aspect-square flex items-center justify-center opacity-0 translate-y-4">
                             <DotLottieReact
                                 height={600}
                                 width={600}
@@ -92,11 +100,14 @@ export default function Home() {
                     </div>
                 </div>
             </div>
-            <div className="h-[120vh] w-full flex items-center justify-center bg-neutral-950 rounded-t-[90px]">
+            <div id="features" className="h-[120vh] w-full flex items-center justify-center bg-neutral-950 rounded-t-[90px]">
                 <Features />
             </div>
-            <div className="h-screen w-full flex items-center justify-center bg-neutral-100">
+            <div id="about" className="h-screen w-full flex items-center justify-center bg-neutral-100">
                 <About />
+            </div>
+            <div id="story" className="w-full">
+                <ProjectStory />
             </div>
         </div>
     );

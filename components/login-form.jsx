@@ -11,20 +11,26 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import Link from "next/link";
-import { useActionState, useEffect } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { login } from "@/app/actions/auth";
 
 export function LoginForm({ className, ...props }) {
-    const [state, action, pending] = useActionState(login, undefined);
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
+    const [message, setMessage] = useState("");
     const router = useRouter();
 
-    // Handle successful login redirect
-    useEffect(() => {
-        if (state?.success && state?.redirectTo) {
-            router.push(state.redirectTo);
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        
+        if (email === "admin@example.com") {
+            router.push("/dashboard");
+        } else if (email === "user@example.com") {
+            router.push("/home");
+        } else {
+            setMessage("Invalid credentials. Use admin@example.com or user@example.com");
         }
-    }, [state, router]);
+    };
 
     return (
         <div className={cn("flex flex-col gap-6", className)} {...props}>
@@ -36,11 +42,11 @@ export function LoginForm({ className, ...props }) {
                     </CardDescription>
                 </CardHeader>
                 <CardContent>
-                    <form action={action}>
+                    <form onSubmit={handleSubmit}>
                         <div className="flex flex-col gap-6">
-                            {state?.message && (
+                            {message && (
                                 <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md text-sm">
-                                    {state.message}
+                                    {message}
                                 </div>
                             )}
                             <div className="grid gap-3">
@@ -50,13 +56,10 @@ export function LoginForm({ className, ...props }) {
                                     name="email"
                                     type="email"
                                     placeholder="m@example.com"
+                                    value={email}
+                                    onChange={(e) => setEmail(e.target.value)}
                                     required
                                 />
-                                {state?.errors?.email && (
-                                    <p className="text-red-600 text-sm">
-                                        {state.errors.email[0]}
-                                    </p>
-                                )}
                             </div>
                             <div className="grid gap-3">
                                 <Label htmlFor="password">Password</Label>
@@ -64,26 +67,22 @@ export function LoginForm({ className, ...props }) {
                                     id="password"
                                     name="password"
                                     type="password"
+                                    value={password}
+                                    onChange={(e) => setPassword(e.target.value)}
                                     required
                                 />
-                                {state?.errors?.password && (
-                                    <p className="text-red-600 text-sm">
-                                        {state.errors.password[0]}
-                                    </p>
-                                )}
                             </div>
                             <div className="flex flex-col gap-3">
                                 <Button
                                     type="submit"
                                     className="w-full"
-                                    disabled={pending}
                                 >
-                                    {pending ? "Signing in..." : "Sign in"}
+                                    Sign in
                                 </Button>
                                 <div className="text-center text-sm">
                                     Don't have an account?{" "}
                                     <Link
-                                        href={"/auth/signup"}
+                                        href={"/signup"}
                                         className="underline underline-offset-4"
                                     >
                                         Sign up
@@ -91,11 +90,16 @@ export function LoginForm({ className, ...props }) {
                                 </div>
                                 <div className="text-center text-sm">
                                     <Link
-                                        href={"/auth/forgot"}
+                                        href={"/forgot"}
                                         className="underline underline-offset-4"
                                     >
                                         Forgot your password?
                                     </Link>
+                                </div>
+                                <div className="text-center text-sm text-gray-600">
+                                    <p>Demo accounts:</p>
+                                    <p>admin@example.com → Dashboard</p>
+                                    <p>user@example.com → Home</p>
                                 </div>
                             </div>
                         </div>

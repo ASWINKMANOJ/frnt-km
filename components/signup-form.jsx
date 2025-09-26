@@ -11,20 +11,22 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import Link from "next/link";
-import { useActionState, useEffect } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { signup } from "@/app/actions/auth";
 
 export function SignupForm({ className, ...props }) {
-    const [state, action, pending] = useActionState(signup, undefined);
+    const [name, setName] = useState("");
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
+    const [message, setMessage] = useState("");
     const router = useRouter();
 
-    // Handle successful signup redirect
-    useEffect(() => {
-        if (state?.success && state?.redirectTo) {
-            router.push(state.redirectTo);
-        }
-    }, [state, router]);
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        
+        // Simple signup - just redirect to home
+        router.push("/home");
+    };
 
     return (
         <div className={cn("flex flex-col gap-6", className)} {...props}>
@@ -36,11 +38,11 @@ export function SignupForm({ className, ...props }) {
                     </CardDescription>
                 </CardHeader>
                 <CardContent>
-                    <form action={action}>
+                    <form onSubmit={handleSubmit}>
                         <div className="flex flex-col gap-6">
-                            {state?.message && (
+                            {message && (
                                 <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md text-sm">
-                                    {state.message}
+                                    {message}
                                 </div>
                             )}
                             <div className="grid gap-3">
@@ -50,13 +52,10 @@ export function SignupForm({ className, ...props }) {
                                     name="name"
                                     type="text"
                                     placeholder="Jane Doe"
+                                    value={name}
+                                    onChange={(e) => setName(e.target.value)}
                                     required
                                 />
-                                {state?.errors?.name && (
-                                    <p className="text-red-600 text-sm">
-                                        {state.errors.name[0]}
-                                    </p>
-                                )}
                             </div>
                             <div className="grid gap-3">
                                 <Label htmlFor="email">Email</Label>
@@ -65,13 +64,10 @@ export function SignupForm({ className, ...props }) {
                                     name="email"
                                     type="email"
                                     placeholder="m@example.com"
+                                    value={email}
+                                    onChange={(e) => setEmail(e.target.value)}
                                     required
                                 />
-                                {state?.errors?.email && (
-                                    <p className="text-red-600 text-sm">
-                                        {state.errors.email[0]}
-                                    </p>
-                                )}
                             </div>
                             <div className="grid gap-3">
                                 <Label htmlFor="password">Password</Label>
@@ -79,37 +75,22 @@ export function SignupForm({ className, ...props }) {
                                     id="password"
                                     name="password"
                                     type="password"
+                                    value={password}
+                                    onChange={(e) => setPassword(e.target.value)}
                                     required
                                 />
-                                {state?.errors?.password && (
-                                    <div className="text-red-600 text-sm">
-                                        <p>Password must:</p>
-                                        <ul className="list-disc list-inside">
-                                            {state.errors.password.map(
-                                                (error) => (
-                                                    <li key={error}>
-                                                        - {error}
-                                                    </li>
-                                                )
-                                            )}
-                                        </ul>
-                                    </div>
-                                )}
                             </div>
                             <div className="flex flex-col gap-3">
                                 <Button
                                     type="submit"
                                     className="w-full"
-                                    disabled={pending}
                                 >
-                                    {pending
-                                        ? "Creating account..."
-                                        : "Create account"}
+                                    Create account
                                 </Button>
                                 <div className="text-center text-sm">
                                     Already have an account?{" "}
                                     <Link
-                                        href={"/auth/login"}
+                                        href={"/login"}
                                         className="underline underline-offset-4"
                                     >
                                         Log in

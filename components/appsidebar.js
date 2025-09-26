@@ -33,7 +33,6 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "./ui/button";
-import { LogoutButton } from "./logout-button";
 import { useState } from "react";
 
 // Menu items.
@@ -210,9 +209,9 @@ export function AppSidebar({ isLoading }) {
                                 <AvatarFallback>CN</AvatarFallback>
                             </Avatar>
                             <div>
-                                <LogoutButton variant="outline">
+                                <Button variant="outline">
                                     Log Out
-                                </LogoutButton>
+                                </Button>
                             </div>
                         </div>
                     </SidebarFooter>

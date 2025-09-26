@@ -1,6 +1,5 @@
 "use client";
 import { useState } from "react";
-import { useAuth } from "@/lib/useAuth";
 import {
     Card,
     CardContent,
@@ -24,7 +23,6 @@ import {
 import { Switch } from "@/components/ui/switch";
 import { Separator } from "@/components/ui/separator";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { LogoutButton } from "@/components/logout-button";
 import {
     User,
     Mail,
@@ -41,11 +39,10 @@ import {
 } from "lucide-react";
 
 export default function ProfilePage() {
-    const { user, isAuthenticated, isLoading } = useAuth();
     const [isEditing, setIsEditing] = useState(false);
     const [profileData, setProfileData] = useState({
-        name: user?.name || "",
-        email: user?.email || "",
+        name: "John Doe",
+        email: "john.doe@example.com",
         phone: "+1 (555) 123-4567",
         location: "San Francisco, CA",
         bio: "Passionate developer with a love for creating amazing user experiences. Always learning and exploring new technologies.",
@@ -89,25 +86,6 @@ export default function ProfilePage() {
         // Show success message
     };
 
-    if (isLoading) {
-        return (
-            <div className="flex items-center justify-center min-h-screen">
-                <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-gray-900"></div>
-            </div>
-        );
-    }
-
-    if (!isAuthenticated) {
-        return (
-            <div className="flex items-center justify-center min-h-screen">
-                <div className="text-center">
-                    <h1 className="text-2xl font-bold text-red-600 mb-4">
-                        Please log in to view your profile
-                    </h1>
-                </div>
-            </div>
-        );
-    }
 
     return (
         <div className="pt-8 px-4 md:px-6 lg:px-8 max-w-4xl mx-auto">
@@ -123,20 +101,7 @@ export default function ProfilePage() {
                         </p>
                     </div>
                     <div className="flex items-center gap-3">
-                        <Badge
-                            variant={
-                                user?.role === "admin"
-                                    ? "destructive"
-                                    : user?.role === "moderator"
-                                    ? "secondary"
-                                    : "default"
-                            }
-                        >
-                            {user?.role?.toUpperCase()}
-                        </Badge>
-                        <LogoutButton variant="outline" size="sm">
-                            <LogoutButton />
-                        </LogoutButton>
+                        <Button variant="outline">Log Out</Button>
                     </div>
                 </div>
             </div>
@@ -213,11 +178,7 @@ export default function ProfilePage() {
                                         alt="Profile"
                                     />
                                     <AvatarFallback className="text-lg">
-                                        {user?.name
-                                            ?.split(" ")
-                                            .map((n) => n[0])
-                                            .join("")
-                                            .toUpperCase() || "U"}
+                                        JD
                                     </AvatarFallback>
                                 </Avatar>
                                 <div className="space-y-2">
