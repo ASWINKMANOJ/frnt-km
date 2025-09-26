@@ -4,47 +4,10 @@ import { AppSidebar } from "@/components/appsidebar";
 import { useEffect, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { useAuth } from "@/lib/useAuth";
 
 export default function ChatPage() {
     const [isLoading, setIsLoading] = useState(false);
-    const { user, isAuthenticated, isLoading: authLoading } = useAuth();
-
-    // Debug logging
-    useEffect(() => {
-        console.log("Chat Page - Auth State:", {
-            user,
-            isAuthenticated,
-            authLoading,
-        });
-    }, [user, isAuthenticated, authLoading]);
-    // Show loading state while auth is loading
-    if (authLoading) {
-        return (
-            <div className="flex items-center justify-center min-h-screen">
-                <div className="text-center">
-                    <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-gray-900 mx-auto mb-4"></div>
-                    <p>Loading authentication...</p>
-                </div>
-            </div>
-        );
-    }
-
-    // Show auth debug info
-    if (!isAuthenticated) {
-        return (
-            <div className="flex items-center justify-center min-h-screen">
-                <div className="text-center">
-                    <h1 className="text-2xl font-bold text-red-600 mb-4">
-                        Authentication Error
-                    </h1>
-                    <p>User: {JSON.stringify(user)}</p>
-                    <p>Authenticated: {String(isAuthenticated)}</p>
-                    <p>Loading: {String(authLoading)}</p>
-                </div>
-            </div>
-        );
-    }
+    
 
     return (
         <SidebarProvider>

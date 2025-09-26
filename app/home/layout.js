@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { ProtectedRoute } from "@/components/ProtectedRoute";
+
 
 export default function HomeLayout({ children }) {
     const pathname = usePathname();
@@ -9,7 +9,6 @@ export default function HomeLayout({ children }) {
     const isActive = (href) => pathname.startsWith(href);
 
     return (
-        <ProtectedRoute allowedRoles={["user", "admin", "moderator"]}>
             <div className="min-h-screen bg-gray-50 relative">
                 <div className="w-auto pt-4 absolute top-2 left-1/2 -translate-x-1/2 z-10">
                     <div className="max-w-7xl mx-auto px-4 md:px-6">
@@ -52,6 +51,5 @@ export default function HomeLayout({ children }) {
 
                 <div>{children}</div>
             </div>
-        </ProtectedRoute>
     );
 }
